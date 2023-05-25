@@ -1,36 +1,38 @@
-# Omnivore Import Tool
+# Pocket2Omnivore: Migration tool
 
-> This is a tools using [Omnivore's](https://omnivore.app/) GQL Api endpoint to initiate a bulk import of data into Omnivore.
-
-
-# Usage
+## Usage
 
 Step 1: Create a corresponding Python environment and install the necessary dependencies by running:
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
-Step 2: Modify the environment variables in the `.env` file. You can apply for the api_key on the [API Keys](https://omnivore.app/settings/api) page of Omnivore, and you will need to open Matter's [Web App](https://web.getmatter.com/list/queue) to obtain the matter_cookie.
+Step 2: Modify the environment variables in the `.env` file. You can apply for the api_key on the [API Keys](https://omnivore.app/settings/api) page of Omnivore.
 
+Step 3: Export your existing articles from Pocket and store the generated html file in the folder `pocket_export`. File name should be `ril_export.html`
 
-![](./screens/matter-cookie.png)
-
-Step 3: Run your program.
+Step 4: Run your program.
 
 ```python
 python sync_articles_to_omnivore.py
 ```
 
-**In theory, this program can help you import any articles that conform to the format into Omnivore. Later, I will provide corresponding instructions.**
+## Information
 
-# Author
+This script is intented to be used to import your articles previously stored in Pocket into Omnivore.
+It will try to identify those articles and their information from the html file provided by Pocket.
+When saving these articles into Omnivore, it will also try to add to them the following information:
 
-👤 Leetao
+- URL
+- Title
+- Date of creation
+- Tags
+- Archive status
 
-Twitter: [@LeetaoGoooo](https://twitter.com/LeetaoGoooo)
-Github: [@LeetaoGoooo](https://github.com/LeetaoGoooo)
+  To add tags, it will first have to check if they already exist or not, and create them if they are missing.
 
-# Screens
+## Credits
 
-<image src="screens/article%20with%20labels.png" width="300"/> <image src="screens/labels.png" width="300"/> 
+- [LeetaoGoooo/Import2Omnivore](https://github.com/LeetaoGoooo/Import2Omnivore): A tool to export articles from Matter and import them into Omnivore.
+- [daviddavo/pocket2omnivore](https://github.com/daviddavo/pocket2omnivore): Jupiter Notebook with some steps by steps to import your articles from Pocket into Omnivore.
