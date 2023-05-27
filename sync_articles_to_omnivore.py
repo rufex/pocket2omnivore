@@ -26,17 +26,20 @@ def pocket_to_omnivore():
             f"Next article to upload ({i+1}/{total_rows}) => {article['title']}"
         )
         saved_page_id = omnivore.save_page(article["href"])
+        logging.debug(f"(Save) Response: {saved_page_id}")
         logging.info(f"Uploaded")
         # We need to wait a bit before updating the page
-        time.sleep(4)
-        update = omnivore.update_page(
+        time.sleep(5)
+        updated = omnivore.update_page(
             page_id=saved_page_id, date=article["time_added"], title=article["title"]
         )
+        logging.debug(f"(Update) Response: {updated}")
         logging.info(f"Information updated")
         if article["read"]:
-            omnivore.archive_page(id=saved_page_id, status=True)
+            archived = omnivore.archive_page(id=saved_page_id, status=True)
+            logging.debug(f"(Archive) Response: {archived}")
             logging.info(f"Article archived")
-            time.sleep(2)
+            time.sleep(5)
         if article["tags"]:
             tags = article["tags"].split(",")
             labels_to_insert = []
@@ -54,16 +57,18 @@ def pocket_to_omnivore():
                         color=f"#{random.randint(0, 0xFFFFFF):06x}",
                         description="",
                     )
+                    logging.debug(f"(Create tag) Response: {new_label}")
                     logging.info(f"New tag created: ${tag}")
-                    time.sleep(2)
+                    time.sleep(5)
                     labels.append(new_label)
                     label_id = new_label["id"]
                 # Collect labels to insert
                 labels_to_insert.append(label_id)
             # Insert all labels at once
-            omnivore.set_labels(page_id=saved_page_id, label_ids=labels_to_insert)
+            set_label = omnivore.set_labels(page_id=saved_page_id, label_ids=labels_to_insert)
+            logging.debug(f"(Set tag) Response: {set_label}")
             logging.info(f"Tags inserted")
-            time.sleep(2)
+            time.sleep(5)
 
 
 if __name__ == "__main__":

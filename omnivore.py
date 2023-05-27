@@ -18,18 +18,19 @@ class Label(TypedDict):
 
 class Omnivore:
     api = "https://api-prod.omnivore.app/api/graphql"
-    headers = {"authorization": os.getenv("api_key")}  # your api key
+    api_key = os.getenv("api_key") or ""
+    headers = {"authorization": api_key}  # your api key
 
     def _request_from_omnivore(self, payload: dict, retry=3) -> Dict:
         if not retry:
             logging.error("Retry timeout")
-            return
+            return None
         try:
             resp = requests.post(self.api, headers=self.headers, json=payload)
             if resp.status_code != 200:
                 logging.error(f"Response Status from Omnivore: {resp.status_code}")
                 logging.error(resp.text)
-                return
+                return None
             return resp.json()
         except Exception:
             logging.error(f"Request failed: {Exception}")
@@ -62,12 +63,15 @@ class Omnivore:
         }
         """
         result = self._request_from_omnivore({"query": body})
+        logging.debug(result)
         if not result:
-            return
+            return None
         return result["data"]["labels"]["labels"]
 
     def create_label(
-        self, name: str = None, color: str = None, description: str = None
+        self, name: str = None, 
+        color: str = None, 
+        description: str = None
     ) -> Label:
         """create label
 
@@ -100,9 +104,10 @@ class Omnivore:
             color=color, name=name, description=description
         )
         result = self._request_from_omnivore({"query": body})
+        logging.debug(result)
         if not result:
             logging.error(f"Creation of label failed (empty response)")
-            return
+            return None
         create_label_result = result["data"]["createLabel"]
         if "errorCodes" in create_label_result:
             logging.error(f'label:{name} {create_label_result["errorCodes"]}')
@@ -147,6 +152,7 @@ class Omnivore:
             "variables": {"input": {"pageId": page_id, "labelIds": label_ids}},
         }
         result = self._request_from_omnivore(payload)
+        logging.debug(result)
         if not result:
             return False
         return True
@@ -177,8 +183,9 @@ class Omnivore:
         """
         payload = {"query": save_page_mutation, "variables": {"input": {"url": url}}}
         result = self._request_from_omnivore(payload)
+        logging.debug(result)
         if not result:
-            return
+            return None
         return result["data"]["createArticleSavingRequest"]["articleSavingRequest"][
             "id"
         ]
@@ -211,6 +218,7 @@ class Omnivore:
             "variables": {"input": {"linkId": id, "archived": status}},
         }
         result = self._request_from_omnivore(payload)
+        logging.debug(result)
         if not result:
             return False
         return True
@@ -253,18 +261,22 @@ class Omnivore:
                 description
             }
             """
+        parsed_date = None
+        if date:
+            parsed_date = date.isoformat()
         payload = {
             "query": update_page_mutation,
             "variables": {
                 "input": {
                     "pageId": page_id,
-                    "savedAt": date.isoformat(),
+                    "savedAt": parsed_date,
                     "title": title,
                     "description": description,
                 }
             },
         }
         result = self._request_from_omnivore(payload)
+        logging.debug(result)
         if not result:
             return False
         return True
