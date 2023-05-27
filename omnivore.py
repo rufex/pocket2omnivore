@@ -65,6 +65,7 @@ class Omnivore:
         result = self._request_from_omnivore({"query": body})
         logging.debug(result)
         if not result:
+            logging.error(f"Get labels failed")
             return None
         return result["data"]["labels"]["labels"]
 
@@ -106,12 +107,12 @@ class Omnivore:
         result = self._request_from_omnivore({"query": body})
         logging.debug(result)
         if not result:
-            logging.error(f"Creation of label failed (empty response)")
+            logging.error(f"Creation of label failed")
             return None
         create_label_result = result["data"]["createLabel"]
         if "errorCodes" in create_label_result:
             logging.error(f'label:{name} {create_label_result["errorCodes"]}')
-            return
+            return None
         return create_label_result["label"]
 
     def set_labels(self, page_id: str, label_ids: List[str]) -> bool:
@@ -185,6 +186,7 @@ class Omnivore:
         result = self._request_from_omnivore(payload)
         logging.debug(result)
         if not result:
+            logging.error(f"Save url failed")
             return None
         return result["data"]["createArticleSavingRequest"]["articleSavingRequest"][
             "id"
@@ -220,6 +222,7 @@ class Omnivore:
         result = self._request_from_omnivore(payload)
         logging.debug(result)
         if not result:
+            logging.error(f"archive page failed")
             return False
         return True
 
@@ -278,5 +281,6 @@ class Omnivore:
         result = self._request_from_omnivore(payload)
         logging.debug(result)
         if not result:
+            logging.error(f"update page failed")
             return False
         return True
